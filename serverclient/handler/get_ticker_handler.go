@@ -8,11 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SetTickerHandler struct {
-	Proxy *proxy.SetTicker
+type GetTickerHandler struct {
+	Proxy *proxy.GetTicker
 }
 
-func (s *SetTickerHandler) Handler(c *gin.Context) {
+func (g *GetTickerHandler) Handler(c *gin.Context) {
 	upgrader := NewUpgrader()
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -20,13 +20,14 @@ func (s *SetTickerHandler) Handler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Failed to upgrade to WebSocket " + err.Error()})
 		return
 	}
-	// defer conn.Close() //this will close the connection
 
-	request := &SetTickerRequest{}
+	request := &GetTickerRequest{}
 	err = c.ShouldBindQuery(request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid request " + err.Error()})
 		return
 	}
-	s.Proxy.SetTicker(conn, request.Id, request.Last, request.Message)
+
+	g.Proxy.GetTicker(conn, request.Id)
+
 }

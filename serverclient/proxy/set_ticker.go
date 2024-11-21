@@ -2,22 +2,31 @@ package proxy
 
 import (
 	fromserver "websocketexample/serverclient/from_server"
+	"websocketexample/serverclient/hub"
 
 	"github.com/gorilla/websocket"
 )
 
-type GetTicker struct {
-	server fromserver.FromServerInterface
+type SetTicker struct {
+	Hub *hub.ServerHub
 }
 
-func NewGetTickerModel(server fromserver.FromServerInterface) *GetTicker {
-	return &GetTicker{
-		server: server,
+func NewSetTickerModel(hub *hub.ServerHub) *SetTicker {
+	return &SetTicker{
+		Hub: hub,
 	}
 }
 
-func (g *GetTicker) GetTicker(clientws *websocket.Conn, last string, message string) error {
-	_formserver := fromserver.NewGetTicker(last, message, clientws)
-	_formserver.Run()
+func (s *SetTicker) SetTicker(clientws *websocket.Conn, id string, last string, message string) error {
+
+	ticker := &fromserver.SetTicker{
+		Id:       id,
+		Last:     last,
+		Message:  message,
+		Clientws: clientws,
+		Hub:      s.Hub,
+	}
+	_formserver := fromserver.NewSetTicker(ticker)
+	s.Hub.RegisterTicker(_formserver)
 	return nil
 }
