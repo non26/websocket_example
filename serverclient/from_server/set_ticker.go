@@ -80,6 +80,7 @@ func (s *SetTicker) Run() error {
 	defer ticker.Stop()
 
 	ticker_number := 0
+	// send pong to client
 	s.Clientws.SetPongHandler(func(appData string) error {
 		return nil
 	})
